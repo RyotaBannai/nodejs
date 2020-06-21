@@ -1,5 +1,7 @@
 import express from "express";
 import path from "path";
+import router from "./router";
+import "reflect-metadata";
 
 const app: express.Express = express();
 
@@ -17,21 +19,10 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use(express.static("public"));
 app.set("views", path.join(__dirname, "resources/views/"));
 app.set("view engine", "ejs");
 
-// Get と Post のルーティンング
-const router: express.Router = express.Router();
-router.get(
-  "/api/getTest/:id",
-  (req: express.Request, res: express.Response) => {
-    //res.send(req.query); // ?id=id
-    res.send(req.params); // /:id // or access through req.param("tagId"));
-  }
-);
-app.get("/", (req: express.Request, res: express.Response) => {
-  res.render("index", { title: "Hey", message: "Hello there!" });
-});
 app.use(router);
 
 // 3000 番ポートで API サーバー起動
