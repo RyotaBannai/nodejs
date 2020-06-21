@@ -31,6 +31,7 @@ import path from "path";
   createConnection({ ...options, name: "default" })
     .then(async (connection) => {
       const app = createExpressServer({
+        cors: true,
         controllers: [UserController],
       });
       app.set("views", path.join(__dirname, "resources/views/"));
