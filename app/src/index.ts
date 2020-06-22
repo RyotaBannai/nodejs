@@ -29,7 +29,7 @@ import path from "path";
   //     .catch((error) => console.log(error));
 
   createConnection({ ...options, name: "default" })
-    .then(async (connection) => {
+    .then(async (_) => {
       const app = createExpressServer({
         cors: true,
         controllers: [UserController],
