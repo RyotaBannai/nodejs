@@ -17,6 +17,11 @@ module.exports = [
   {
     name: "production",
     type: "postgres",
+    host: "localhost",
+    port: 3306,
+    username: "test", // you might be able to set in env file.
+    password: "test",
+    database: "test",
     url: process.env.DATABASE_URL,
     synchronize: true, // switch this to false once you have the initial tables created and use migrations instead
     logging: false,
