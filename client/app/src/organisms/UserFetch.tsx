@@ -6,9 +6,7 @@ import axios from "axios";
 
 interface Props {}
 
-const request = (e: SyntheticEvent) => {};
-
-export const APIRequest: React.FC<Props> = () => {
+export const UserFetch: React.FC<Props> = () => {
   useEffect(() => {}, []);
   const [value, setValue] = useState<number>(0);
   const [result, setResult] = useState<object>({});
@@ -16,7 +14,6 @@ export const APIRequest: React.FC<Props> = () => {
   const handleSubmit = (e: any) => {
     e.preventDefault();
     const endpoint = `http://localhost:3000/users/${value}`;
-    console.log(endpoint);
     axios
       .get(endpoint)
       .then((response) => {

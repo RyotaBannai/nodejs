@@ -1,12 +1,12 @@
 import React from "react";
-import { APIRequest } from "../organisms/APIRequest";
+import { UserFetch } from "../organisms/UserFetch";
 
 interface Props {}
 
 export const Main: React.FC<Props> = () => {
   return (
     <div>
-      <APIRequest />
+      <UserFetch />
     </div>
   );
 };
