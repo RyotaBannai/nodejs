@@ -22,9 +22,12 @@
 
 - `Relation`: We are forced to `use a function that returns a class`, instead of using the class directly, because of the language specifics. We can also write it as `() => Photo`, but we use `type => Photo` as a convention to increase code readability. The `type variable` itself does not contain anything. (this is how you define relation `in an unidirectional way.`)
 - We also add a `@JoinColumn decorator`, which indicates that `this side of the relationship will own the relationship`. Relations can be `unidirectional` or `bidirectional`. Only one side of relational can be owning. Using `@JoinColumn decorator` is `required on the owner side of the relationship`. The owning side of a relationship contains a column with a foreign key in the database.
-- `Owner じゃ無い方を先に save`する。
-- `Bidirectional way`: `@OneToOne(type => Photo, photo => photo.metadata)` or `@OneToOne(type => PhotoMetadata, photoMetadata => photoMetadata.photo)`
--
+- `Owner じゃ無い方を先に save`
+- We can setup `cascade options` in our relations, in the cases when we want our related object to be saved whenever the other object is saved. `cascade を使いたいときは save したい側で true にする。`
+- `Bidirectional way`: `@OneToOne(type => Photo, photo => photo.metadata)` or `@OneToOne(type => PhotoMetadata, photoMetadata => photoMetadata.photo)` -　`many-to-one / one-to-many relation`:
+  `many-to-one`: a book has only one author
+  `one-to-many`: author has many books
+  Author contains an `inverse side of a relation`. `OneToMany` is always an inverse side of relation, and `it can't exist without` `ManyToOne` `on the other side of the relation`.
 
 #### sqlite
 

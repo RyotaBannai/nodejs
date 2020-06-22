@@ -1,13 +1,12 @@
-import { Entity, Column } from "typeorm";
+import { Entity, Column, ManyToOne } from "typeorm";
 import { Base } from "./Base";
+import { UserWord } from "./UserWord";
 
 @Entity()
 export class Word extends Base {
   @Column()
   name: string;
 
-  @Column({
-    default: 1,
-  })
-  created_by: number;
+  @ManyToOne((type) => UserWord, (user_word) => user_word.word)
+  user_word: UserWord;
 }
