@@ -33,9 +33,14 @@ export default function Layout() {
                 Fetch User <span className="sr-only">(current)</span>
               </div>
             </NavLink>
-            <NavLink exact to="/insert" activeClassName="active">
+            <NavLink exact to="/user_insert" activeClassName="active">
               <div className="nav-link">
                 Add User <span className="sr-only">(current)</span>
+              </div>
+            </NavLink>
+            <NavLink exact to="/word_insert" activeClassName="active">
+              <div className="nav-link">
+                Add Word <span className="sr-only">(current)</span>
               </div>
             </NavLink>
           </li>
