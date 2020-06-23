@@ -1,12 +1,4 @@
-import {
-  Get,
-  Post,
-  Render,
-  JsonController,
-  Controller,
-  Param,
-  Body,
-} from "routing-controllers";
+import { Get, Post, JsonController, Param, Body } from "routing-controllers";
 import { User } from "../entity/User";
 import { Repository, getRepository } from "typeorm";
 import { UserWord } from "../entity/UserWord";

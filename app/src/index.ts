@@ -2,6 +2,7 @@ import "reflect-metadata";
 import { createConnection, getConnectionOptions } from "typeorm";
 import { createExpressServer } from "routing-controllers";
 import { UserController } from "./controllers/UserController";
+import { WordController } from "./controllers/WordController";
 import path from "path";
 
 (async () => {
@@ -32,7 +33,7 @@ import path from "path";
     .then(async (_) => {
       const app = createExpressServer({
         cors: true,
-        controllers: [UserController],
+        controllers: [UserController, WordController],
       });
       app.set("views", path.join(__dirname, "resources/views/"));
       app.set("view engine", "ejs");
