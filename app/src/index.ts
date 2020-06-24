@@ -2,7 +2,8 @@ import "reflect-metadata";
 import { createConnection, getConnectionOptions } from "typeorm";
 import { createExpressServer } from "routing-controllers";
 import { UserController } from "./controllers/UserController";
-import { WordController } from "./controllers/WordController";
+import { ItemController } from "./controllers/ItemController";
+import { ListController } from "./controllers/ListController";
 import { FolderController } from "./controllers/FolderController";
 import path from "path";
 
@@ -10,31 +11,16 @@ import path from "path";
   const options = await getConnectionOptions(
     process.env.NODE_ENV || "development"
   );
-  //   createConnection({ ...options, name: "default" })
-  //     .then(async (connection) => {
-  //       console.log("Inserting a new user into the database...");
-  //       const user = new User();
-  //       user.firstName = "Timber";
-  //       user.lastName = "Saw";
-  //       user.age = 25;
-  //       await connection.manager.save(user);
-  //       console.log("Saved a new user with id: " + user.id);
-
-  //       console.log("Loading users from the database...");
-  //       const users = await connection.manager.find(User);
-  //       console.log("Loaded users: ", users);
-
-  //       console.log(
-  //         "Here you can setup and run express/koa/any other framework."
-  //       );
-  //     })
-  //     .catch((error) => console.log(error));
-
   createConnection({ ...options, name: "default" })
     .then(async (_) => {
       const app = createExpressServer({
         cors: true,
-        controllers: [UserController, WordController, FolderController],
+        controllers: [
+          UserController,
+          ItemController,
+          FolderController,
+          ListController,
+        ],
       });
       app.set("views", path.join(__dirname, "resources/views/"));
       app.set("view engine", "ejs");

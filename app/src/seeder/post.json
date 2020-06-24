@@ -1,0 +1,15 @@
+{
+  "Item": [
+    { "data": "run", "type": "word" },
+    { "data": "rehash", "type": "word" },
+    { "data": "Better late than never", "type": "phrase" }
+  ],
+  "List": [{ "data": "focus" }, { "data": "done" }],
+  "folder": [
+    {
+      "name": "astronomy",
+      "description": "reletive to science",
+      "parent_id": 2
+    }
+  ]
+}
