@@ -8,6 +8,5 @@ export class Word extends Base {
   name: string;
 
   @ManyToOne((type) => UserMeta, (user_meta) => user_meta.word)
-  @JoinColumn({ name: "userMetaUserId" })
   user_meta: UserMeta;
 }
