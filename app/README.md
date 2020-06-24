@@ -61,3 +61,36 @@ const users = await connection
 
 - `./node_modules/.bin/ts-node ./node_modules/typeorm/cli.js migration:generate -c development -n 'User'`
 - `./node_modules/.bin/ts-node ./node_modules/typeorm/cli.js schema:drop -c development`
+
+### Tips
+
+- [Finding entity with with relation condition](https://github.com/typeorm/typeorm/issues/4396)
+
+```javascript
+@Entity()
+export class User {
+  name: string;
+
+  @ManyToOne(() => Role, (role) => role.users)
+  role: Role;
+}
+
+@Entity()
+export class Role {
+  @OneToMany(() => User, (user) => user.role)
+  users: User[];
+}
+```
+
+```javascript
+roleRepository.find({
+  join: { alias: "roles", innerJoin: { users: "roles.users" } },
+  where: (qb) => {
+    qb.where({
+      // Filter Role fields
+      a: 1,
+      b: 2,
+    }).andWhere("users.name = :userName", { userName: "John Doe" }); // Filter related field
+  },
+});
+```
