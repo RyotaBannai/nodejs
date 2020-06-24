@@ -1,6 +1,6 @@
-import { Entity, Column, OneToOne } from "typeorm";
+import { Entity, Column, OneToOne, JoinColumn } from "typeorm";
 import { Base } from "./Base";
-import { UserWord } from "./UserWord";
+import { UserMeta } from "./UserMeta";
 @Entity()
 export class User extends Base {
   @Column()
@@ -12,6 +12,8 @@ export class User extends Base {
   @Column()
   age: number;
 
-  @OneToOne((type) => UserWord, (user_word) => user_word.user)
-  user_word: UserWord;
+  @OneToOne((type) => UserMeta, (user_meta) => user_meta.user, {
+    cascade: true,
+  })
+  user_meta: UserMeta;
 }

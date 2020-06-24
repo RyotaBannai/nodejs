@@ -1,7 +1,7 @@
 import { Get, Post, JsonController, Param, Body } from "routing-controllers";
 import { Word } from "../entity/Word";
 import { Repository, getRepository, createQueryBuilder } from "typeorm";
-import { UserWord } from "../entity/UserWord";
+import { UserMeta } from "../entity/UserMeta";
 
 @JsonController()
 export class WordController {
@@ -17,19 +17,25 @@ export class WordController {
 
   @Get("/words/:id")
   get(@Param("id") id: number) {
-    return this.repository.findOne(id, { relations: ["user_word"] });
+    return this.repository.find({
+      relations: ["user_meta", "user_meta.user"],
+      where: {
+        user_meta: {
+          userId: id,
+        },
+      },
+    });
   }
 
   @Post("/words/save")
   async post(@Body() word: Word) {
-    const user_word: UserWord | unknown = await getRepository(UserWord).findOne(
+    const user_word: UserMeta | unknown = await getRepository(UserMeta).findOne(
       {
-        where: { userId: 1 },
+        where: { userId: 2 },
       }
     );
-    await console.log(user_word);
     const new_word: Word = this.repository.create(word);
-    if (user_word instanceof UserWord) new_word.user_word = user_word;
+    if (user_word instanceof UserMeta) new_word.user_meta = user_word;
     return this.repository.save(new_word);
   }
 }

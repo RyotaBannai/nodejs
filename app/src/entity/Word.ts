@@ -1,12 +1,13 @@
-import { Entity, Column, ManyToOne } from "typeorm";
+import { Entity, Column, ManyToOne, JoinColumn } from "typeorm";
 import { Base } from "./Base";
-import { UserWord } from "./UserWord";
+import { UserMeta } from "./UserMeta";
 
 @Entity()
 export class Word extends Base {
   @Column()
   name: string;
 
-  @ManyToOne((type) => UserWord, (user_word) => user_word.word)
-  user_word: UserWord;
+  @ManyToOne((type) => UserMeta, (user_meta) => user_meta.word)
+  @JoinColumn({ name: "userMetaUserId" })
+  user_meta: UserMeta;
 }

@@ -10,19 +10,15 @@ import { User } from "./User";
 import { Word } from "./Word";
 
 @Entity()
-export class UserWord {
+export class UserMeta {
   @PrimaryColumn()
   userId: number;
 
-  @PrimaryColumn()
-  wordId: number;
-
-  @OneToOne((type) => User, (user) => user.user_word, { primary: true })
+  @OneToOne((type) => User, (user) => user.user_meta, { primary: true })
   @JoinColumn({ name: "userId" })
   user: User;
 
-  @OneToMany((type) => Word, (word) => word.user_word, { primary: true })
-  @JoinColumn({ name: "wordId" })
+  @OneToMany((type) => Word, (word) => word.user_meta)
   word: Word[];
 
   @Column({

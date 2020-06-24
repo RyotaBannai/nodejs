@@ -22,6 +22,21 @@
 
 - `Relation`: We are forced to `use a function that returns a class`, instead of using the class directly, because of the language specifics. We can also write it as `() => Photo`, but we use `type => Photo` as a convention to increase code readability. The `type variable` itself does not contain anything. (this is how you define relation `in an unidirectional way.`)
 - We also add a `@JoinColumn decorator`, which indicates that `this side of the relationship will own the relationship`. Relations can be `unidirectional` or `bidirectional`. Only one side of relational can be owning. Using `@JoinColumn decorator` is `required on the owner side of the relationship`. The owning side of a relationship contains a column with a foreign key in the database.
+- `@JoinColumn` must be set only on one side of relation - the side that must have the foreign key in the database table.
+
+```javascript
+const userRepository = connection.getRepository(User);
+const users = await userRepository.find({ relations: ["profile"] });
+```
+
+```javascript
+const users = await connection
+  .getRepository(User)
+  .createQueryBuilder("user")
+  .leftJoinAndSelect("user.profile", "profile")
+  .getMany();
+```
+
 - `Owner じゃ無い方を先に save`
 - We can setup `cascade options` in our relations, in the cases when we want our related object to be saved whenever the other object is saved. `cascade を使いたいときは save したい側で true にする。`
 - `Bidirectional way`: `@OneToOne(type => Photo, photo => photo.metadata)` or `@OneToOne(type => PhotoMetadata, photoMetadata => photoMetadata.photo)` -　`many-to-one / one-to-many relation`:
@@ -41,3 +56,8 @@
 #### express + controllers?
 
 - [`typestack/routing-controllers`](https://github.com/typestack/routing-controllers)
+
+#### Migration
+
+- `./node_modules/.bin/ts-node ./node_modules/typeorm/cli.js migration:generate -c development -n 'User'`
+- `./node_modules/.bin/ts-node ./node_modules/typeorm/cli.js schema:drop -c development`
