@@ -7,7 +7,7 @@ import {
   JoinColumn,
 } from "typeorm";
 import { User } from "./User";
-import { Word } from "./Word";
+import { Item } from "./Item";
 
 @Entity()
 export class UserMeta {
@@ -18,8 +18,8 @@ export class UserMeta {
   @JoinColumn({ name: "userId" })
   user: User;
 
-  @OneToMany((type) => Word, (word) => word.user_meta)
-  word: Word[];
+  @OneToMany((type) => Item, (item) => item.user_meta)
+  item: Item[];
 
   @Column({
     type: "datetime",
