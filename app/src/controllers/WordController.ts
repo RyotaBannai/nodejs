@@ -22,9 +22,12 @@ export class WordController {
 
   @Post("/words/save")
   async post(@Body() word: Word) {
-    const user_word: UserWord | unknown = await createQueryBuilder("user_word")
-      .where("UserWord_userId = :id", { id: 1 })
-      .getOne();
+    const user_word: UserWord | unknown = await getRepository(UserWord).findOne(
+      {
+        where: { userId: 1 },
+      }
+    );
+    await console.log(user_word);
     const new_word: Word = this.repository.create(word);
     if (user_word instanceof UserWord) new_word.user_word = user_word;
     return this.repository.save(new_word);
