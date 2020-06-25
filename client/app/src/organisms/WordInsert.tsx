@@ -34,7 +34,7 @@ export const WordInsert: React.FC<Props> = () => {
   const [result, setResult] = useState({});
   const handleSubmit = (e: any) => {
     e.preventDefault();
-    const endpoint = `http://localhost:3000/words/save`;
+    const endpoint = `http://localhost:3000/items/save`;
     console.log(word);
     console.log(endpoint);
     axios
