@@ -2,15 +2,22 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  BaseEntity,
 } from "typeorm";
+import { Field, ID, ArgsType, ObjectType } from "type-graphql";
 
-export abstract class Base {
+@ArgsType()
+@ObjectType()
+export abstract class Base extends BaseEntity {
+  @Field(() => ID)
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Field()
   @UpdateDateColumn()
   updated_at: string;
 
+  @Field()
   @CreateDateColumn()
   created_at: string;
 }

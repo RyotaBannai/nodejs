@@ -1,32 +1,43 @@
 import "reflect-metadata";
 import { createConnection, getConnectionOptions } from "typeorm";
-import { createExpressServer } from "routing-controllers";
-import { UserController } from "./controllers/UserController";
-import { ItemController } from "./controllers/ItemController";
-import { ListController } from "./controllers/ListController";
-import { FolderController } from "./controllers/FolderController";
+import { buildSchema } from "type-graphql";
+import { ItemResolver } from "./modules/item/ItemResolver";
+import { ApolloServer } from "apollo-server-express";
+import cors from "cors";
+import Express from "express";
 import path from "path";
 
-(async () => {
+const main = async () => {
   const options = await getConnectionOptions(
     process.env.NODE_ENV || "development"
   );
-  createConnection({ ...options, name: "default" })
-    .then(async (_) => {
-      const app = createExpressServer({
-        cors: true,
-        controllers: [
-          UserController,
-          ItemController,
-          FolderController,
-          ListController,
-        ],
-      });
-      app.set("views", path.join(__dirname, "resources/views/"));
-      app.set("view engine", "ejs");
+  await createConnection({ ...options, name: "default" })
+    .then(async () => console.log("Typeorm Success."))
+    .catch((err) => console.log("Typeorm Error: ", err));
 
-      app.listen(3000);
-      console.log("Server is up and running on port 3000.");
+  // Building schema as well
+  const schema = await buildSchema({
+    resolvers: [ItemResolver],
+  });
+
+  const apolloServer = new ApolloServer({
+    schema,
+  });
+
+  const app = Express();
+
+  app.use(
+    cors({
+      credentials: true,
+      origin: "http://localhost:3000", // 4000 ?
     })
-    .catch((error) => console.log("Error: ", error));
-})();
+  );
+
+  apolloServer.applyMiddleware({ app });
+
+  app.listen(4000, () => {
+    console.log("server started on http://localhost:4000/graphql");
+  });
+};
+
+main().catch((err) => console.log(err));
