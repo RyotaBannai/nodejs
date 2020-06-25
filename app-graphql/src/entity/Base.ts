@@ -6,7 +6,6 @@ import {
 } from "typeorm";
 import { Field, ID, ArgsType, ObjectType } from "type-graphql";
 
-@ArgsType()
 @ObjectType()
 export abstract class Base extends BaseEntity {
   @Field(() => ID)

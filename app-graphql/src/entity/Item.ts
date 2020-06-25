@@ -1,11 +1,10 @@
-import { Entity, Column, ManyToOne, OneToMany, JoinTable } from "typeorm";
+import { Entity, Column, ManyToOne, OneToMany, JoinColumn } from "typeorm";
 import { Ctx, Field, ID, ObjectType, ArgsType } from "type-graphql";
 import { Base } from "./Base";
 import { UserMeta } from "./UserMeta";
 import { ItemList } from "./ItemList";
 type ItemType = "word" | "phrase" | "sentence" | "quiz";
 
-@ArgsType()
 @ObjectType()
 @Entity()
 export class Item extends Base {
@@ -17,8 +16,9 @@ export class Item extends Base {
   @Column()
   type: ItemType;
 
+  @Field((type) => [ItemList])
   @OneToMany((type) => ItemList, (item_list) => item_list.item)
-  @JoinTable()
+  @JoinColumn()
   listConnector: ItemList[];
 
   // @Column({ nullable: true })
@@ -34,4 +34,11 @@ export class Item extends Base {
   // get endIndex(): number {
   //   return this.skip + this.take;
   // }
+}
+export class ItemArgs {
+  @Field((type) => String, { nullable: false })
+  data: string;
+
+  @Field((type) => String, { nullable: false })
+  type: ItemType;
 }
