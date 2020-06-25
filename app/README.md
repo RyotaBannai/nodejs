@@ -94,3 +94,30 @@ roleRepository.find({
   },
 });
 ```
+
+- If you want to use typeorm's default many-to-many connector then assign new list of entity instance like below.
+
+```javascript
+  @Post("/items/add/")
+  async addToList(@Body() data: AddType) {
+    const this_item: Item = await this.repository.findOneOrFail(data.id, {
+      relations: ["list"],
+    });
+    console.log(this_item);
+
+    let new_relation: List | undefined;
+    // Set | List // should wrap with Promise because of the inside conditional and can be next statement run earlier than this bock
+    if (data.type === "list") {
+      new_relation = await getRepository(List).findOne(data.data_id);
+    }
+    if (new_relation instanceof List) {
+      console.log(new_relation);
+      if (this_item.list.length > 0) {
+        this_item.list = [...this_item.list, new_relation];
+      } else {
+        this_item.list = [new_relation]; // quick fixed by declare something somewhere
+      }
+    }
+    return this.repository.save(this_item);
+  }
+```

@@ -1,7 +1,8 @@
 import { Get, Post, JsonController, Param, Body } from "routing-controllers";
 import { Item } from "../entity/Item";
-import { Repository, getRepository, createQueryBuilder } from "typeorm";
 import { List } from "../entity/List";
+import { Repository, getRepository, createQueryBuilder } from "typeorm";
+import { ItemList } from "../entity/ItemList";
 import { UserMeta } from "../entity/UserMeta";
 
 type DataType = "set" | "list";
@@ -25,52 +26,34 @@ export class ItemController {
 
   @Post("/items/add/")
   async addToList(@Body() data: AddType) {
-    const this_item: Item = await this.repository.findOneOrFail(data.id, {
-      relations: ["list"],
-    });
+    const this_item: Item = await this.repository.findOneOrFail(data.id);
     console.log(this_item);
 
-    let new_relation: List | undefined; // Set | List // should wrap with Promise because of the inside conditional and can be next statement run earlier than this bock
+    let item_list: ItemList;
     if (data.type === "list") {
-      new_relation = await getRepository(List).findOne({
-        where: {
-          id: data.data_id,
-        },
-      });
+      const list: List = await getRepository(List).findOneOrFail(data.data_id);
+      item_list = await getRepository(ItemList).create();
+      item_list.item = this_item;
+      item_list.list = list;
+      getRepository(ItemList).save(item_list);
+      return item_list;
     }
-    if (new_relation instanceof List) {
-      console.log(new_relation);
-      if (this_item.list.length > 0) {
-        this_item.list = [...this_item.list, new_relation];
-      } else {
-        this_item.list = [new_relation]; // quick fixed by declare something somewhere
-      }
-    }
-
-    return this.repository.save(this_item);
 
     // } else if (data.type === "set") {
-    //   new_relation = getRepository(Set).findOne({
-    //     where: {
-    //       id: data.data_id,
-    //     },
-    //   });
-    //   new_relation.then((value) => {
-    //     if (value instanceof List) this_item.list = [...this_item.list, value]; // quick fixed by declare something somewhere
-    //   });
+    //return this.repository.save(this_item);
   }
 
   @Get("/items_id/:id")
   getById(@Param("id") id: number) {
     return this.repository.findByIds([id], {
-      relations: ["list"],
+      relations: ["listConnector", "listConnector.list"],
     });
   }
 
   @Get("/items/:id")
   get(@Param("id") id: number) {
     return this.repository.find({
-      relations: ["user_meta", "user_meta.user, list"],
+      relations: ["user_meta", "user_meta.user", "list"],
       where: {
         user_meta: {
           userId: id,

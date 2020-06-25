@@ -1,15 +1,15 @@
-import { Entity, Column, ManyToOne, JoinColumn, ManyToMany } from "typeorm";
+import { Entity, Column, OneToMany, JoinColumn, ManyToMany } from "typeorm";
 import { Base } from "./Base";
-import { Item } from "./Item";
+import { ItemList } from "./ItemList";
 
 @Entity()
 export class List extends Base {
   @Column()
   name: string;
 
-  @ManyToMany((type) => Item, (item) => item.list)
-  item: Item[];
+  @OneToMany((type) => ItemList, (item_list) => item_list.list)
+  itemConnector: ItemList[];
 
-  //   @ManyToMany((type) => Set, (set) => set.list)
-  //   set: Set[];
+  // @Column({ nullable: true })
+  // setConnector: ItemSet[]];
 }

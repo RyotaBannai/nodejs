@@ -3,13 +3,12 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
-  ManyToMany,
+  OneToMany,
   JoinTable,
 } from "typeorm";
 import { Base } from "./Base";
 import { UserMeta } from "./UserMeta";
-import { List } from "./List";
-
+import { ItemList } from "./ItemList";
 type ItemType = "word" | "phrase" | "sentence" | "quiz";
 
 @Entity()
@@ -20,12 +19,12 @@ export class Item extends Base {
   @Column()
   type: ItemType;
 
-  @ManyToMany((type) => List, (list) => list.item)
+  @OneToMany((type) => ItemList, (item_list) => item_list.item)
   @JoinTable()
-  list: List[];
+  listConnector: ItemList[];
 
   // @Column({ nullable: true })
-  // set: List | null;
+  // setConnector: ItemSet[]];
 
   @ManyToOne((type) => UserMeta, (user_meta) => user_meta.item)
   user_meta: UserMeta;
