@@ -1,5 +1,5 @@
 import { Entity, Column, ManyToOne, OneToMany, JoinColumn } from "typeorm";
-import { Ctx, Field, ID, ObjectType, ArgsType } from "type-graphql";
+import { Ctx, Field, ID, ObjectType, ArgsType, InputType } from "type-graphql";
 import { Base } from "./Base";
 import { UserMeta } from "./UserMeta";
 import { ItemList } from "./ItemList";
@@ -35,7 +35,9 @@ export class Item extends Base {
   //   return this.skip + this.take;
   // }
 }
-export class ItemArgs {
+
+@InputType()
+export class ItemArgs implements Partial<Item> {
   @Field((type) => String, { nullable: false })
   data: string;
 
