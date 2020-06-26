@@ -3,6 +3,7 @@ import { Ctx, Field, ID, ObjectType, ArgsType, InputType } from "type-graphql";
 import { Base } from "./Base";
 import { UserMeta } from "./UserMeta";
 import { ItemList } from "./ItemList";
+import { List } from "./List";
 type ItemType = "word" | "phrase" | "sentence" | "quiz";
 
 @ObjectType()
@@ -27,6 +28,9 @@ export class Item extends Base {
   @ManyToOne((type) => UserMeta, (user_meta) => user_meta.item)
   user_meta: UserMeta;
 
+  @Field((type) => [List])
+  list: List[];
+
   // helpers - index calculations
   // get startIndex(): number {
   //   return this.skip;
@@ -36,8 +40,8 @@ export class Item extends Base {
   // }
 }
 
-@InputType()
-export class ItemArgs implements Partial<Item> {
+@InputType({ description: "New item data" })
+export class addItemInput implements Partial<Item> {
   @Field((type) => String, { nullable: false })
   data: string;
 

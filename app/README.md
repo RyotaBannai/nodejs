@@ -142,3 +142,5 @@ await connection.transaction(async (manager) => {
   const timber = await userRepository.findByName("Timber", "Saw");
 });
 ```
+
+- "./node_modules/.bin/ts-node src/index.ts"
