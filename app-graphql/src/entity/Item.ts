@@ -15,7 +15,7 @@ export class Item extends Base {
 
   @Field()
   @Column()
-  type: ItemType;
+  type: ItemType; // should use graphql enum type
 
   @Field((type) => [ItemList])
   @OneToMany((type) => ItemList, (item_list) => item_list.item)

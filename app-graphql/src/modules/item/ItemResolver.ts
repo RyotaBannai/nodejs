@@ -16,6 +16,7 @@ import { ItemList } from "../../entity/ItemList";
 
 @Resolver((of) => Item)
 export class ItemResolver {
+  private itemsCollection: Item | Item[] = [];
   @Mutation(() => Item)
   async createItem(
     @Arg("data") newItemData: addItemInput, // client should use data as key and value of object te same as addItemInput type
@@ -28,22 +29,22 @@ export class ItemResolver {
 
   @Query((returns) => Item)
   async getOneItem(@Arg("id") id: number): Promise<Item | undefined> {
-    const item = await Item.findOne(id, {
+    this.itemsCollection = await Item.findOneOrFail(id, {
       relations: ["listConnector", "listConnector.list"],
     });
-    console.log(item);
-    return item;
+    console.log(this.itemsCollection);
+    return this.itemsCollection;
   }
 
   @FieldResolver()
   async list(@Root() item: Item) {
-    const this_item = await Item.findOneOrFail(item.id, {
+    this.itemsCollection = await Item.findOneOrFail(item.id, {
       relations: ["listConnector", "listConnector.list"],
     });
-    const list: List[] = [];
-    for (const item_list of this_item.listConnector) {
-      list.push(item_list.list);
+    const this_list: List[] = [];
+    for (const { list } of this.itemsCollection.listConnector) {
+      this_list.push(list);
     }
-    return list;
+    return this_list;
   }
 }

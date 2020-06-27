@@ -10,7 +10,7 @@ import { Field, ID, ArgsType, ObjectType } from "type-graphql";
 export abstract class Base extends BaseEntity {
   @Field(() => ID)
   @PrimaryGeneratedColumn()
-  id: number;
+  readonly id: number;
 
   @Field()
   @UpdateDateColumn()
