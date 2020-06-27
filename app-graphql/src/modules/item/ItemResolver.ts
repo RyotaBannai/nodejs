@@ -8,6 +8,7 @@ import {
   Ctx,
   FieldResolver,
   Root,
+  createParamDecorator,
 } from "type-graphql";
 import { Item, addItemInput } from "../../entity/Item";
 import { Context } from "vm";
@@ -16,7 +17,8 @@ import { ItemList } from "../../entity/ItemList";
 
 @Resolver((of) => Item)
 export class ItemResolver {
-  private itemsCollection: Item | Item[] = [];
+  private itemCollection: Item | Item[] = [];
+
   @Mutation(() => Item)
   async createItem(
     @Arg("data") newItemData: addItemInput, // client should use data as key and value of object te same as addItemInput type
@@ -28,23 +30,30 @@ export class ItemResolver {
   }
 
   @Query((returns) => Item)
-  async getOneItem(@Arg("id") id: number): Promise<Item | undefined> {
-    this.itemsCollection = await Item.findOneOrFail(id, {
-      relations: ["listConnector", "listConnector.list"],
-    });
-    console.log(this.itemsCollection);
-    return this.itemsCollection;
+  async getOneItem(
+    @Arg("id") id: number,
+    @routinizedFindById() item: Item
+  ): Promise<Item | undefined> {
+    return item;
   }
 
   @FieldResolver()
   async list(@Root() item: Item) {
-    this.itemsCollection = await Item.findOneOrFail(item.id, {
+    this.itemCollection = await Item.findOneOrFail(item.id, {
       relations: ["listConnector", "listConnector.list"],
     });
     const this_list: List[] = [];
-    for (const { list } of this.itemsCollection.listConnector) {
+    for (const { list } of this.itemCollection.listConnector) {
       this_list.push(list);
     }
     return this_list;
   }
+}
+
+function routinizedFindById() {
+  return createParamDecorator((params) => {
+    return Item.findOneOrFail(params.args.id, {
+      relations: ["listConnector", "listConnector.list"],
+    });
+  });
 }
