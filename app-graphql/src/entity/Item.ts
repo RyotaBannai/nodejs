@@ -1,5 +1,13 @@
 import { Entity, Column, ManyToOne, OneToMany, JoinColumn } from "typeorm";
-import { Ctx, Field, ID, ObjectType, ArgsType, InputType } from "type-graphql";
+import {
+  Ctx,
+  Field,
+  ID,
+  ObjectType,
+  ArgsType,
+  InputType,
+  Float,
+} from "type-graphql";
 import { Base } from "./Base";
 import { UserMeta } from "./UserMeta";
 import { ItemList } from "./ItemList";
@@ -42,9 +50,12 @@ export class Item extends Base {
 
 @InputType({ description: "New item data" })
 export class addItemInput implements Partial<Item> {
-  @Field((type) => String, { nullable: false })
+  @Field((type) => Float, { nullable: true })
+  id?: number;
+
+  @Field((type) => String, { nullable: true })
   data: string;
 
-  @Field((type) => String, { nullable: false })
+  @Field((type) => String, { nullable: true })
   type: ItemType;
 }

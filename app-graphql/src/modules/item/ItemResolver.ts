@@ -29,6 +29,22 @@ export class ItemResolver {
     return await new_item.save();
   }
 
+  @Mutation(() => Item)
+  async updateItem(
+    @Arg("data") updateItemData: addItemInput,
+    @Ctx() ctx: Context
+  ): Promise<Item> {
+    const item = await Item.findOneOrFail(updateItemData.id);
+    const updated = Item.create({
+      ...item,
+      ...updateItemData,
+    });
+    await updated.save();
+    return await await Item.findOneOrFail(item.id, {
+      relations: ["listConnector", "listConnector.list"],
+    });
+  }
+
   @Query((returns) => Item)
   async getOneItem(
     @Arg("id") id: number,
@@ -50,9 +66,22 @@ export class ItemResolver {
   }
 }
 
+function getId(params: any): number | undefined {
+  if ("id" in params) {
+    return Number(params.id);
+  } else {
+    for (const [key, value] of Object.entries(params)) {
+      if (typeof value == "object" && value !== null) {
+        return getId(value);
+      }
+    }
+  }
+}
+
 function routinizedFindById() {
   return createParamDecorator((params) => {
-    return Item.findOneOrFail(params.args.id, {
+    let id: number | undefined = getId(params.args);
+    return Item.findOneOrFail(id, {
       relations: ["listConnector", "listConnector.list"],
     });
   });
