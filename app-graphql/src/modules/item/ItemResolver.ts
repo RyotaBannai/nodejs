@@ -10,7 +10,7 @@ import {
   Root,
   createParamDecorator,
 } from "type-graphql";
-import { Item, addItemInput } from "../../entity/Item";
+import { Item, addItemInput, GetItemArgs } from "../../entity/Item";
 import { Context } from "vm";
 import { List } from "../../entity/List";
 import { ItemList } from "../../entity/ItemList";
@@ -40,9 +40,19 @@ export class ItemResolver {
       ...updateItemData,
     });
     await updated.save();
-    return await await Item.findOneOrFail(item.id, {
+    return await Item.findOneOrFail(item.id, {
       relations: ["listConnector", "listConnector.list"],
     });
+  }
+
+  @Query((returns) => [Item])
+  async getItems(
+    @Args() { startIndex, endIndex }: GetItemArgs
+  ): Promise<Item[]> {
+    this.itemCollection = await Item.find({
+      relations: ["listConnector", "listConnector.list"],
+    });
+    return this.itemCollection.slice(startIndex, endIndex);
   }
 
   @Query((returns) => Item)
