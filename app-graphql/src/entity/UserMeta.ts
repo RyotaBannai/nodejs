@@ -21,6 +21,15 @@ export class UserMeta {
   @JoinColumn({ name: "userId" })
   user: User;
 
+  @Column()
+  firstName: string;
+
+  @Column()
+  lastName: string;
+
+  @Column()
+  age: number;
+
   @OneToMany((type) => Item, (item) => item.user_meta)
   item: Item[];
 

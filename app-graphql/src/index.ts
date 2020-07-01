@@ -2,10 +2,15 @@ import "reflect-metadata";
 import { createConnection, getConnectionOptions } from "typeorm";
 import { buildSchema } from "type-graphql";
 import { ItemResolver } from "./modules/item/ItemResolver";
-import { ApolloServer } from "apollo-server-express";
+import { UserResolver } from "./modules/user/UserResolver";
+import { customAuthChecker } from "./entity/User";
+import { ApolloServer, AuthenticationError } from "apollo-server-express";
 import cors from "cors";
+import helmet from "helmet";
 import Express from "express";
 import path from "path";
+import passport from "passport";
+import * as passportJWT from "passport-jwt";
 
 const main = async () => {
   const options = await getConnectionOptions(
@@ -17,16 +22,13 @@ const main = async () => {
 
   // Building schema as well
   const schema = await buildSchema({
-    resolvers: [ItemResolver],
+    resolvers: [ItemResolver, UserResolver],
+    authChecker: customAuthChecker,
   });
 
   const apolloServer = new ApolloServer({
     schema,
-    // context: ({ req, res }: any) => ({
-    //   req,
-    //   res,
-    //   authorsLoader: createAuthorsLoader()
-    // }),
+    context: ({ req, res }: any) => ({ req, res }),
   });
 
   const app = Express();
@@ -34,9 +36,10 @@ const main = async () => {
   app.use(
     cors({
       credentials: true,
-      origin: "http://localhost:3000", // 4000 ?
+      origin: "http://localhost:3000",
     })
   );
+  //app.use("/graphql", jwt);
 
   apolloServer.applyMiddleware({ app });
 
@@ -46,3 +49,26 @@ const main = async () => {
 };
 
 main().catch((err) => console.log(err));
+
+passport.use(
+  new passportJWT.Strategy(
+    {
+      jwtFromRequest: passportJWT.ExtractJwt.fromAuthHeaderAsBearerToken(),
+      secretOrKey: "secret",
+    },
+    (jwt_payload: any, done: any) => {
+      console.log(jwt_payload);
+      return done(null, false);
+    }
+  )
+);
+
+const jwt = (req: any, res: any, next: any) => {
+  passport.authenticate("jwt", { session: false }, (err, user, info) => {
+    console.log("inside authentication");
+    console.group(user);
+    req.user = "this is tempt user.";
+
+    next();
+  })(req, res, next);
+};
