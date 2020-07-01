@@ -31,6 +31,8 @@ export class UserResolver {
   @Mutation(() => TokenEntity)
   async createUser(@Arg("data") newUserData: createUserInput): Promise<Token> {
     const new_user = User.create(newUserData);
+    console.log(newUserData);
+    console.log(new_user);
     new_user.passwordHash = await this.getHash(newUserData.password);
     await new_user.save();
     return await createToken(new_user.id);

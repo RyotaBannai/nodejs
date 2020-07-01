@@ -10,6 +10,8 @@ import { Context } from "vm";
 import * as jwt from "jsonwebtoken";
 import { Base } from "./Base";
 import { UserMeta } from "./UserMeta";
+import passport from "passport";
+import * as passportJWT from "passport-jwt";
 
 @ObjectType()
 @Entity()
@@ -72,13 +74,49 @@ export const customAuthChecker: AuthChecker<Context> = (
   { root, args, context, info },
   roles
 ) => {
-  console.log(args);
-  console.log(roles);
-  console.log(context);
+  console.log(context.req.user);
 
   // here you can read user from context
   // and check his permission in db against `roles` argument
   // that comes from `@Authorized`, eg. ["ADMIN", "MODERATOR"]
 
   return true; // or false if access denied
+};
+
+passport.use(
+  new passportJWT.Strategy(
+    {
+      jwtFromRequest: passportJWT.ExtractJwt.fromAuthHeaderAsBearerToken(),
+      secretOrKey: "secret",
+    },
+    (jwt_payload: any, done: any) => {
+      User.findOne(jwt_payload.id)
+        .then((user) => {
+          if (user) {
+            done(null, user);
+          } else {
+            done(null, false);
+          }
+        })
+        .catch((err) => {
+          return done(err, false);
+        });
+    }
+  )
+);
+
+export const jwtMiddleware = (req: any, res: any, next: any) => {
+  passport.authenticate("jwt", { session: false }, (err, user, info) => {
+    if (err) {
+      return next(err);
+    }
+    if (!user) {
+      return res
+        .status(401)
+        .json({ errors: { message: info || "user unknown" } })
+        .end();
+    }
+    req.user = user;
+    next();
+  })(req, res, next);
 };

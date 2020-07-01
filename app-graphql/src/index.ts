@@ -3,6 +3,7 @@ import { createConnection, getConnectionOptions } from "typeorm";
 import { buildSchema } from "type-graphql";
 import { ItemResolver } from "./modules/item/ItemResolver";
 import { UserResolver } from "./modules/user/UserResolver";
+import { jwtMiddleware } from "./entity/User";
 import { customAuthChecker } from "./entity/User";
 import { ApolloServer, AuthenticationError } from "apollo-server-express";
 import cors from "cors";
@@ -39,7 +40,7 @@ const main = async () => {
       origin: "http://localhost:3000",
     })
   );
-  //app.use("/graphql", jwt);
+  app.use("/graphql", jwtMiddleware);
 
   apolloServer.applyMiddleware({ app });
 
@@ -49,26 +50,3 @@ const main = async () => {
 };
 
 main().catch((err) => console.log(err));
-
-passport.use(
-  new passportJWT.Strategy(
-    {
-      jwtFromRequest: passportJWT.ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: "secret",
-    },
-    (jwt_payload: any, done: any) => {
-      console.log(jwt_payload);
-      return done(null, false);
-    }
-  )
-);
-
-const jwt = (req: any, res: any, next: any) => {
-  passport.authenticate("jwt", { session: false }, (err, user, info) => {
-    console.log("inside authentication");
-    console.group(user);
-    req.user = "this is tempt user.";
-
-    next();
-  })(req, res, next);
-};
