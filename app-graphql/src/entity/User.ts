@@ -1,12 +1,15 @@
 import { Entity, Column, OneToOne, JoinColumn } from "typeorm";
 import {
+  Int,
   Field,
   InputType,
   ObjectType,
   ArgsType,
   AuthChecker,
+  createUnionType,
 } from "type-graphql";
 import { Context } from "vm";
+import express from "express";
 import * as jwt from "jsonwebtoken";
 import { Base } from "./Base";
 import { UserMeta } from "./UserMeta";
@@ -37,6 +40,40 @@ export class User extends Base {
   user_meta: UserMeta;
 }
 
+@ArgsType()
+export class LoginInput implements Partial<User> {
+  @Field((type) => String, { nullable: false })
+  email: string;
+
+  @Field((type) => String, { nullable: false })
+  password: string;
+}
+
+interface ReturnMessages {
+  message: string;
+}
+
+@ObjectType()
+export class LoginFails implements ReturnMessages {
+  @Field()
+  message: string;
+}
+
+export const LoginOutputUnion = createUnionType({
+  name: "LoginOutput", // the name of the GraphQL union
+  types: () => [TokenEntity, LoginFails] as const, // function that returns tuple of object types classes
+  resolveType: (value) => {
+    // if value if array, this source comes off as single object
+    if ("token" in value) {
+      return TokenEntity; // we can return object type class (the one with `@ObjectType()`)
+    }
+    if ("message" in value) {
+      return LoginFails; // or the schema name of the type as a string
+    }
+    return undefined;
+  },
+});
+
 @InputType({ description: "Create New User Data" })
 export class createUserInput implements Partial<User> {
   @Field((type) => String, { nullable: true })
@@ -64,7 +101,7 @@ export interface Token {
 
 @ObjectType()
 export class TokenEntity implements Token {
-  @Field()
+  @Field((type) => Int)
   expires_in: number;
   @Field()
   token: string;
@@ -105,10 +142,13 @@ passport.use(
   )
 );
 
-export const jwtMiddleware = (req: any, res: any, next: any) => {
+export const jwtMiddleware = (req: express.Request, res: express.Response) =>
   passport.authenticate("jwt", { session: false }, (err, user, info) => {
+    if (["CREATE", "LOGIN"].includes(req.body.operationName)) {
+      return true;
+    }
     if (err) {
-      return next(err);
+      return res.status(401).end();
     }
     if (!user) {
       return res
@@ -117,6 +157,4 @@ export const jwtMiddleware = (req: any, res: any, next: any) => {
         .end();
     }
     req.user = user;
-    next();
-  })(req, res, next);
-};
+  })(req, res);

@@ -8,7 +8,7 @@ import { customAuthChecker } from "./entity/User";
 import { ApolloServer, AuthenticationError } from "apollo-server-express";
 import cors from "cors";
 import helmet from "helmet";
-import Express from "express";
+import express from "express";
 import path from "path";
 import passport from "passport";
 import * as passportJWT from "passport-jwt";
@@ -21,7 +21,6 @@ const main = async () => {
     .then(async () => console.log("Typeorm Success."))
     .catch((err) => console.log("Typeorm Error: ", err));
 
-  // Building schema as well
   const schema = await buildSchema({
     resolvers: [ItemResolver, UserResolver],
     authChecker: customAuthChecker,
@@ -29,10 +28,12 @@ const main = async () => {
 
   const apolloServer = new ApolloServer({
     schema,
-    context: ({ req, res }: any) => ({ req, res }),
+    context: ({ req, res }) => {
+      jwtMiddleware(req, res);
+    },
   });
 
-  const app = Express();
+  const app = express();
 
   app.use(
     cors({
@@ -40,7 +41,6 @@ const main = async () => {
       origin: "http://localhost:3000",
     })
   );
-  app.use("/graphql", jwtMiddleware);
 
   apolloServer.applyMiddleware({ app });
 
